@@ -1,14 +1,14 @@
 #include <iostream>
 #include "SupportResistance.h"
-#include "../../Data.h"
+#include "../../src/DataReader/Data.h"
 
 
 int main(){
-    data::OHLC ohlc;
-    data::readCSV("Data/^NSEMDCP50.csv", ohlc);
-    data::printOHLC(ohlc, 0, 5);
+    data::DataFeed dataFeed;
+    dataFeed.readCSV("Data/^NSEMDCP50.csv");
+    dataFeed.printOHLC(0, 5);
 
-    SupportResistance strat(ohlc);
+    SupportResistance strat(dataFeed);
     strat.defaultParams();
     strat.run();
     strat.stats();

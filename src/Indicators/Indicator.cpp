@@ -1,20 +1,16 @@
 #include "Indicator.h"
-#include "Data.h"
+#include "../DataReader/Data.h"
 #include <vector>
 #include <stdint.h>
 #include <cmath>
 
-Indicators::Indicators(std::vector<data::OHLC> data){
-    this->data = data;
-}
-
-Indicators::Indicators(data::OHLC ohlc){
-    this->ohlc = ohlc;
+Indicators::Indicators(const data::DataFeed& dataFeed){
+    this->dataFeed = dataFeed;
 }
 
 std::vector<double> Indicators::SMA(int period){
-    std::vector<double> sma(this->ohlc.close.size(), 0.0);
-    std::vector<double> data = this->ohlc.close;
+    std::vector<double> sma(this->dataFeed.getOHLC().close.size(), 0.0);
+    std::vector<double> data = this->dataFeed.getOHLC().close;
     double sum = 0;
     for (int i = 0; i < period; i++){
         sum += data[i];
@@ -29,8 +25,8 @@ std::vector<double> Indicators::SMA(int period){
 }
 
 std::vector<double> Indicators::EMA(int period){
-    std::vector<double> ema(this->ohlc.close.size(), 0.0);
-    std::vector<double> data = this->ohlc.close;
+    std::vector<double> ema(this->dataFeed.getOHLC().close.size(), 0.0);
+    std::vector<double> data = this->dataFeed.getOHLC().close;
     double sum = 0;
     for (int i = 0; i < period; i++){
         sum += data[i];
@@ -43,7 +39,7 @@ std::vector<double> Indicators::EMA(int period){
 }
 
 std::vector<double> Indicators::ADX(int period){
-    std::vector<double> data = this->ohlc.close;
+    std::vector<double> data = this->dataFeed.getOHLC().close;
     std::vector<double> adx(data.size());
     std::vector<double> tr(data.size());
     std::vector<double> plusDM(data.size());
@@ -57,8 +53,8 @@ std::vector<double> Indicators::ADX(int period){
 }
 
 std::vector<double> Indicators::RSI(int period){
-    std::vector<double> rsi(this->ohlc.close.size(), 0.0);
-    std::vector<double> data = this->ohlc.close;
+    std::vector<double> rsi(this->dataFeed.getOHLC().close.size(), 0.0);
+    std::vector<double> data = this->dataFeed.getOHLC().close;
     std::vector<double> gain(data.size(), 0.0);
     std::vector<double> loss(data.size(), 0.0);
     gain[0] = 0;
@@ -88,7 +84,7 @@ std::vector<double> Indicators::RSI(int period){
 }
 
 std::vector<double> Indicators::MACD(int period){
-    std::vector<double> data = this->ohlc.close;
+    std::vector<double> data = this->dataFeed.getOHLC().close;
     std::vector<double> macd(data.size());
     std::vector<double> ema12 = EMA(12);
     std::vector<double> ema26 = EMA(26);
@@ -99,7 +95,7 @@ std::vector<double> Indicators::MACD(int period){
 }
 
 std::vector<double> Indicators::SIGNAL(int period){
-    std::vector<double> data = this->ohlc.close;
+    std::vector<double> data = this->dataFeed.getOHLC().close;
     std::vector<double> signal(data.size());
     std::vector<double> macd = MACD(9);
     for (int i = 0; i < data.size(); i++){
@@ -109,20 +105,20 @@ std::vector<double> Indicators::SIGNAL(int period){
 }
 
 std::vector<double> Indicators::ATR(int period){
-    std::vector<double> data = this->ohlc.close;
+    std::vector<double> data = this->dataFeed.getOHLC().close;
     std::vector<double> atr(data.size());
     for (int i = 0; i < period; i++){
         atr[i] = 0;
     }
     for (int i = period; i < data.size(); i++){
-        double tr = std::max(data[i] - data[i - 1], std::max(data[i] - this->ohlc.high[i - 1], this->ohlc.low[i - 1] - data[i]));
+        double tr = std::max(data[i] - data[i - 1], std::max(data[i] - this->dataFeed.getOHLC().high[i - 1], this->dataFeed.getOHLC().low[i - 1] - data[i]));
         atr[i] = (atr[i - 1] * (period - 1) + tr) / period;
     }
     return atr;
 }
 
 std::vector<double> Indicators::BOLLINGER(int period){
-    std::vector<double> data = this->ohlc.close;
+    std::vector<double> data = this->dataFeed.getOHLC().close;
     std::vector<double> bollinger(data.size());
     std::vector<double> sma = SMA(period);
     std::vector<double> stdDev(data.size());
@@ -143,7 +139,7 @@ std::vector<double> Indicators::BOLLINGER(int period){
 }
 
 std::vector<double> Indicators::STOCHASTIC(int period){
-    std::vector<double> data = this->ohlc.close;
+    std::vector<double> data = this->dataFeed.getOHLC().close;
     std::vector<double> stochastic(data.size());
     for (int i = 0; i < period; i++){
         stochastic[i] = 0;
@@ -165,7 +161,7 @@ std::vector<double> Indicators::STOCHASTIC(int period){
 }
 
 std::vector<double> Indicators::WILLIAMS(int period){
-    std::vector<double> data = this->ohlc.close;
+    std::vector<double> data = this->dataFeed.getOHLC().close;
     std::vector<double> williams(data.size());
     for (int i = 0; i < period; i++){
         williams[i] = 0;
