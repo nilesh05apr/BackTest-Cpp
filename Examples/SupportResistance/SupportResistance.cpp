@@ -1,7 +1,7 @@
 #include "SupportResistance.h"
-#include "../../src/DataReader/Data.h"
-#include "../../src/Indicators/Indicator.h"
-#include "../../src/Strategy/Strategy.h"
+#include "backtest/Data.h"
+#include "backtest/Indicator.h"
+#include "backtest/Strategy.h"
 #include <vector>
 
 

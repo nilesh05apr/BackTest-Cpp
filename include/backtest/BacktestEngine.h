@@ -1,5 +1,4 @@
-#include "../DataReader/Data.cpp"
-#include "../Indicators/Indicator.h"
+#include "Indicator.h"
 #include <vector>
 #include <string>
 #include <stdint.h>

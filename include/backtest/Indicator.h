@@ -1,5 +1,5 @@
 #include <vector>
-#include "../DataReader/Data.h"
+#include "Data.h"
 #include <stdint.h>
 
 #ifndef INDICATOR_H

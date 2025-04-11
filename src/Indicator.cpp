@@ -1,5 +1,5 @@
-#include "Indicator.h"
-#include "../DataReader/Data.h"
+#include "backtest/Data.h"
+#include "backtest/Indicator.h"
 #include <vector>
 #include <stdint.h>
 #include <cmath>
