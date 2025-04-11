@@ -19,4 +19,7 @@ include_directories(include)
 # Executable
 add_executable(BackTest-Cpp ${SOURCES} ${HEADERS})
 
+# Add Core source file libraries.
+add_library(core STATIC ${SOURCES})
+
 add_subdirectory(Examples)
