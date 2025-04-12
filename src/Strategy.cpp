@@ -1,7 +1,9 @@
-#include "Strategy.h"
-#include "../Engine/BacktestEngine.h"
-#include "../DataReader/Data.h"
-#include "../Indicators/Indicator.h"
+#include "backtest/BacktestEngine.h"
+#include "backtest/Data.h"
+#include "backtest/Indicator.h"
+#include "backtest/Strategy.h"
+
+
 #include <stdint.h>
 #include <map>
 #include <string>
@@ -81,5 +83,3 @@ namespace strategy {
 
 // Explicit template instantiation
 template struct strategy::Params<double>;
-template struct strategy::Params<int>;
-template struct strategy::Params<std::string>;

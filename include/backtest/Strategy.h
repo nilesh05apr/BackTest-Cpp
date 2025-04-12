@@ -1,6 +1,6 @@
-#include "../Engine/BacktestEngine.h"
-#include "../DataReader/Data.h"
-#include "../Indicators/Indicator.h"
+#include "BacktestEngine.h"
+#include "Data.h"
+#include "Indicator.h"
 #include <stdint.h>
 #include <map>
 

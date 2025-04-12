@@ -1,43 +1,31 @@
 cmake_minimum_required(VERSION 3.10)
 
-# Set the project name
-project(BackTestCpp)
+project(BackTest-Cpp LANGUAGES CXX)
 
-# Set the C++ standard
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 
-# Add the main executable (assuming you have a main.cpp in the root directory)
-add_executable(BackTestCpp
-    src/Engine/BacktestEngine.cpp
-    src/DataReader/Data.cpp
-    src/Indicators/Indicator.cpp
-    src/Strategy/Strategy.cpp
-)
+# Enable optimizations for release builds
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 ")
+add_compile_options("-Wall" "-Wextra" "-pedantic")
+
+# Source files
+file(GLOB_RECURSE SOURCES src/*.cpp)
+file(GLOB_RECURSE HEADERS include/*.h)
 
 # Include directories
-target_include_directories(BackTestCpp PRIVATE 
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/Engine
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/DataReader
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/Indicators
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/Strategy
-)
+include_directories(include)
 
-# Add the SupportResistance example
-add_executable(SupportResistanceExample
-    Examples/SupportResistance/main.cpp
-    Examples/SupportResistance/SupportResistance.cpp
-    src/Engine/BacktestEngine.cpp
-    src/DataReader/Data.cpp
-    src/Indicators/Indicator.cpp
-    src/Strategy/Strategy.cpp
-)
+# Add Core source file libraries.
+add_library(core STATIC ${SOURCES})
 
-# Include directories for the example
-target_include_directories(SupportResistanceExample PRIVATE 
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/Engine
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/DataReader
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/Indicators
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/Strategy
-    ${CMAKE_CURRENT_SOURCE_DIR}/Examples/SupportResistance
-)
+# Executable
+add_executable(BackTest-Cpp ${SOURCES} ${HEADERS})
+
+target_link_libraries(BackTest-Cpp PRIVATE core)
+
+target_include_directories(core PUBLIC ${CMAKE_SOURCE_DIR}/include)
+
+# Recursively build other projects.
+add_subdirectory(Examples)

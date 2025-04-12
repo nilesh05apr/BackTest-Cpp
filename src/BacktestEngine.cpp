@@ -1,6 +1,5 @@
-#include "BacktestEngine.h"
-#include "../DataReader/Data.h"
-#include "../Indicators/Indicator.h"
+#include "backtest/Data.h"
+#include "backtest/BacktestEngine.h"
 #include <vector>
 #include <string>
 #include <iostream>
