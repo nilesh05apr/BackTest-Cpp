@@ -23,7 +23,5 @@ add_library(core STATIC ${SOURCES})
 # Executable
 add_executable(BackTest-Cpp ${SOURCES} ${HEADERS})
 
-target_link_libraries(BackTest-Cpp PRIVATE core)
-
 # Recursively build other projects.
 add_subdirectory(Examples)
