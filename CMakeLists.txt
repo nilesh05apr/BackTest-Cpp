@@ -23,9 +23,5 @@ add_library(core STATIC ${SOURCES})
 # Executable
 add_executable(BackTest-Cpp ${SOURCES} ${HEADERS})
 
-target_link_libraries(BackTest-Cpp PRIVATE core)
-
-target_include_directories(core PUBLIC ${CMAKE_SOURCE_DIR}/include)
-
 # Recursively build other projects.
 add_subdirectory(Examples)
