@@ -63,7 +63,7 @@ protected:
                 balance_ -= -(price * qty) + fee;
             }
         }
-        std::cout << date << " BUY " << " @ " << price << " x " << qty << "\n";
+        std::cout << date << "\tBUY\t" << "- " << price << " \t-\t " << qty << "\n";
     }
 
     void sell(const std::string& date, double price, std::size_t qty) noexcept {
@@ -85,7 +85,7 @@ protected:
                 balance_ += price * qty - fee;
             }
         }
-        std::cout << date << " SELL " << " @" << price << " x " << qty << "\n";
+        std::cout << date << "\tSELL\t" << "- " << price << " \t-\t " << qty << "\n";
     }
 
     void close(const std::string& date, double price, std::size_t qty) noexcept {
@@ -100,7 +100,7 @@ protected:
             shortQty_ -= qty;
             if (shortQty_ == 0) isShort_ = false;
         }
-        std::cout << date << " CLOSE " << " @ " << price << " x " << qty << "\n";
+        std::cout << date << "\tCLOSE\t" << "- " << price << " \t-\t " << qty << "\n";
     }
 
     Feed& feed_;

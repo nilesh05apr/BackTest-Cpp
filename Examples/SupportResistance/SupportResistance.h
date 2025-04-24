@@ -31,12 +31,14 @@ public:
         double resistance= 2.0 * prevPivot - batch.low[idx-1];
         double price     = batch.open[idx];
         const std::string& date = batch.date[idx];
+        int quantity = 1;
+        quantity = static_cast<int>((balance_ * 0.85) / price);
         if (price > prevPivot && !isLong_) {
-            buy(date, price, 1);
+            buy(date, price, quantity);
         } else if (isLong_ && price >= resistance) {
             close(date, price, longQty_);
         } else if (price < prevPivot && !isShort_) {
-            sell(date, price, 1);
+            sell(date, price, quantity);
         } else if (isShort_ && price <= support) {
             close(date, price, shortQty_);
         }
