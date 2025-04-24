@@ -1,32 +1,15 @@
-#include "BacktestEngine.h"
-#include "Data.h"
-#include "Indicator.h"
-#include <stdint.h>
-#include <map>
+#ifndef BACKTEST_STRATEGY_H
+#define BACKTEST_STRATEGY_H
 
-#ifndef STRATEGY_H  
-#define STRATEGY_H
+#include "backtest/Engine.h"
 
-namespace strategy {
-    template <typename T>
-    struct Params{
-        std::map<std::string, T> data;
+namespace backtest {
 
-        void insert(const std::string& key, T value);
-        bool get(const std::string& key, T& value) const;
-        bool exists(const std::string& key) const;
-        void remove(const std::string& key);
-    };
+template <typename Derived, typename Feed>
+class Strategy : public Engine<Derived, Feed> {
+public:
+    using Engine<Derived, Feed>::Engine;
+};
 
-    class Strategy : public backtest::BacktestEngine {
-        public:
-        Strategy(const data::DataFeed& dataFeed);
-        void defaultParams();
-        template <typename T>
-        void setParams(const Params<T>& params);
-        void next() override;
-    };
-}
-
-
-#endif // STRATEGY_H
+} // namespace backtest
+#endif // BACKTEST_STRATEGY_H

@@ -1,42 +1,34 @@
-#ifndef DATA_H
-#define DATA_H
+#ifndef BACKTEST_DATA_H
+#define BACKTEST_DATA_H
 
 #include <vector>
 #include <string>
-#include <stdint.h>
+#include <cstddef>
+#include "backtest/FileIterator.h"
 
 namespace data {
 
-    struct OHLC {
-        std::string symbol;
-        std::vector<double> open;
-        std::vector<double> high;
-        std::vector<double> low;
-        std::vector<double> close;
-        std::vector<double> adjClose;
-        std::vector<double> volume;
-        std::vector<std::string> date;
-    };
 
-    class DataFeed {
-    public:
-        DataFeed() = default;
+class DataFeed {
+public:
+    virtual ~DataFeed() = default;
+    virtual bool nextBatch() = 0;
+    virtual const OHLCBatch& currentBatch() const = 0;
+};
 
-        void readCSV(const std::string& filename);
-        void printOHLC() const;
-        void printOHLC(uint16_t index) const;
-        void printOHLC(uint16_t start, uint16_t end) const;
-        void clearData();
-
-        const OHLC& getOHLC() const;
-        size_t size() const;
-
-    private:
-        OHLC ohlc;
-
-        void parseLine(const std::string& line);
-    };
+class CSVDataFeed : public DataFeed {
+public:
+    CSVDataFeed(const std::string& filePath, std::size_t batchSize) noexcept
+        : fileIterator_(filePath, batchSize) {}
+    bool nextBatch() override {
+        return fileIterator_.nextBatch();
+    }
+    const OHLCBatch& currentBatch() const override {
+        return fileIterator_.batch();
+    }
+private:
+    FileIterator fileIterator_;
+};
 
 }
-
-#endif // DATA_H
+#endif // BACKTEST_DATA_H
