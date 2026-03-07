@@ -15,17 +15,55 @@ public:
     using Batch = data::OHLCBatch;
 
     explicit Engine(Feed& feed) noexcept
-        : feed_(feed), balance_(0.0), initialCash_(0.0), commissionRate_(0.0), totalCommission_(0.0), slippage_(0.0) {}
+        : feed_(feed), balance_(0.0), initialCash_(0.0), commissionRate_(0.0),
+          totalCommission_(0.0), slippage_(0.0), totalSlippage_(0.0) {}
 
     void setCash(double cash) noexcept { balance_ = initialCash_ = cash; }
     void setCommission(double rate) noexcept { commissionRate_ = rate; totalCommission_ = 0.0; }
     void setSlippage(double slip) noexcept { slippage_ = slip; }
 
+    // Run the full backtest from bar 0.
     void run() {
         static_cast<Derived*>(this)->onStart();
         while (feed_.nextBatch()) {
             const Batch& batch = feed_.currentBatch();
             for (std::size_t i = 0, n = batch.size(); i < n; ++i) {
+                static_cast<Derived*>(this)->onBar(batch, i);
+            }
+        }
+        static_cast<Derived*>(this)->onEnd();
+    }
+
+    // Replay the backtest starting from a specific global bar index.
+    // Bars before startBar are read from the feed but onBar is not invoked,
+    // so indicator warm-up data remains available while trading begins only
+    // at startBar.
+    void runFrom(std::size_t startBar) {
+        feed_.reset();
+        static_cast<Derived*>(this)->onStart();
+        std::size_t globalBar = 0;
+        while (feed_.nextBatch()) {
+            const Batch& batch = feed_.currentBatch();
+            for (std::size_t i = 0, n = batch.size(); i < n; ++i, ++globalBar) {
+                if (globalBar < startBar) continue;
+                static_cast<Derived*>(this)->onBar(batch, i);
+            }
+        }
+        static_cast<Derived*>(this)->onEnd();
+    }
+
+    // Replay the backtest starting from the first bar whose date is >= startDate.
+    // Dates are compared as strings (lexicographic), which works correctly for
+    // ISO-8601 formatted dates (YYYY-MM-DD) as used in the CSV files.
+    void runFrom(const std::string& startDate) {
+        feed_.reset();
+        static_cast<Derived*>(this)->onStart();
+        bool active = false;
+        while (feed_.nextBatch()) {
+            const Batch& batch = feed_.currentBatch();
+            for (std::size_t i = 0, n = batch.size(); i < n; ++i) {
+                if (!active && batch.date[i] < startDate) continue;
+                active = true;
                 static_cast<Derived*>(this)->onBar(batch, i);
             }
         }
