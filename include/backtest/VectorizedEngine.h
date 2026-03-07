@@ -45,10 +45,12 @@ public:
 
     // Open a CSV file and write all subsequent trades to it.
     // The file is created with the header: date,action,price,qty
+    // Each row is flushed immediately for durability.
     void setTradeLogPath(const std::string& path) {
         tradeLog_.open(path);
         if (tradeLog_.is_open()) {
             tradeLog_ << "date,action,price,qty\n";
+            tradeLog_.flush();
         }
     }
 
@@ -109,7 +111,7 @@ protected:
             balance_ += price * static_cast<double>(qty) - fee;
         }
         std::cout << date << "\t" << side << "\t" << price << "\t" << qty << "\n";
-        if (tradeLog_.is_open()) tradeLog_ << date << "," << side << "," << price << "," << qty << "\n";
+        if (tradeLog_.is_open()) { tradeLog_ << date << "," << side << "," << price << "," << qty << "\n"; tradeLog_.flush(); }
     }
 
     Feed&  feed_;

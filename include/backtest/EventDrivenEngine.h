@@ -114,10 +114,12 @@ public:
 
     // Open a CSV file and write all subsequent trades to it.
     // The file is created with the header: date,action,price,qty
+    // Each row is flushed immediately for durability.
     void setTradeLogPath(const std::string& path) {
         tradeLog_.open(path);
         if (tradeLog_.is_open()) {
             tradeLog_ << "date,action,price,qty\n";
+            tradeLog_.flush();
         }
     }
 
@@ -218,7 +220,7 @@ protected:
         isLong_ = true;
         longQty_ += qty;
         std::cout << date << "\tBUY\t" << price << "\t" << qty << "\n";
-        if (tradeLog_.is_open()) tradeLog_ << date << ",BUY," << price << "," << qty << "\n";
+        if (tradeLog_.is_open()) { tradeLog_ << date << ",BUY," << price << "," << qty << "\n"; tradeLog_.flush(); }
     }
 
     void executeSell(const std::string& date, double price, std::size_t qty) noexcept {
@@ -228,7 +230,7 @@ protected:
         isShort_ = true;
         shortQty_ += qty;
         std::cout << date << "\tSELL\t" << price << "\t" << qty << "\n";
-        if (tradeLog_.is_open()) tradeLog_ << date << ",SELL," << price << "," << qty << "\n";
+        if (tradeLog_.is_open()) { tradeLog_ << date << ",SELL," << price << "," << qty << "\n"; tradeLog_.flush(); }
     }
 
     void executeClose(const std::string& date, double price) noexcept {
@@ -237,7 +239,7 @@ protected:
             totalCommission_ += fee;
             balance_ += price * static_cast<double>(longQty_) - fee;
             std::cout << date << "\tCLOSE LONG\t" << price << "\t" << longQty_ << "\n";
-            if (tradeLog_.is_open()) tradeLog_ << date << ",CLOSE LONG," << price << "," << longQty_ << "\n";
+            if (tradeLog_.is_open()) { tradeLog_ << date << ",CLOSE LONG," << price << "," << longQty_ << "\n"; tradeLog_.flush(); }
             longQty_ = 0;
             isLong_  = false;
         } else if (isShort_) {
@@ -245,7 +247,7 @@ protected:
             totalCommission_ += fee;
             balance_ -= price * static_cast<double>(shortQty_) + fee;
             std::cout << date << "\tCLOSE SHORT\t" << price << "\t" << shortQty_ << "\n";
-            if (tradeLog_.is_open()) tradeLog_ << date << ",CLOSE SHORT," << price << "," << shortQty_ << "\n";
+            if (tradeLog_.is_open()) { tradeLog_ << date << ",CLOSE SHORT," << price << "," << shortQty_ << "\n"; tradeLog_.flush(); }
             shortQty_ = 0;
             isShort_ = false;
         }
