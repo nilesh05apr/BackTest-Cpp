@@ -1,2 +1,4 @@
 add_subdirectory(SupportResistance)
 add_subdirectory(StreamingSupportResistance)
+add_subdirectory(EventDrivenSupportResistance)
+add_subdirectory(VectorizedSupportResistance)

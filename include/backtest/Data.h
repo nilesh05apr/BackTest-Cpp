@@ -14,6 +14,9 @@ public:
     virtual ~DataFeed() = default;
     virtual bool nextBatch() = 0;
     virtual const OHLCBatch& currentBatch() const = 0;
+    // Seek back to the beginning of the data source so the feed can be
+    // iterated again from the first bar.
+    virtual void reset() = 0;
 };
 
 class CSVDataFeed : public DataFeed {
@@ -25,6 +28,9 @@ public:
     }
     const OHLCBatch& currentBatch() const override {
         return fileIterator_.batch();
+    }
+    void reset() override {
+        fileIterator_.reset();
     }
 private:
     FileIterator fileIterator_;
