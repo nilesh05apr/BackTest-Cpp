@@ -13,5 +13,11 @@ target_include_directories(backtest INTERFACE
     $<INSTALL_INTERFACE:include>
 )
 
+# Enable CTest
+enable_testing()
+
 # Build example projects
 add_subdirectory(Examples)
+
+# Unit and integration tests
+add_subdirectory(Tests)

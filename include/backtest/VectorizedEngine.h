@@ -23,6 +23,7 @@
 
 #include "backtest/Data.h"
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <cstddef>
 #include <algorithm>
@@ -41,6 +42,21 @@ public:
     void setCash(double cash)       noexcept { balance_ = initialCash_ = cash; }
     void setCommission(double rate) noexcept { commissionRate_ = rate; totalCommission_ = 0.0; }
     void setSlippage(double slip)   noexcept { slippage_ = slip; }
+
+    // Open a CSV file and write all subsequent trades to it.
+    // The file is created with the header: date,action,price,qty
+    // Each row is flushed immediately for durability.
+    void setTradeLogPath(const std::string& path) {
+        tradeLog_.open(path);
+        if (tradeLog_.is_open()) {
+            tradeLog_ << "date,action,price,qty\n";
+            tradeLog_.flush();
+        }
+    }
+
+    double getBalance()         const noexcept { return balance_; }
+    double getInitialCash()     const noexcept { return initialCash_; }
+    double getTotalCommission() const noexcept { return totalCommission_; }
 
     // Run the full vectorized backtest over all available data.
     void run() {
@@ -95,6 +111,7 @@ protected:
             balance_ += price * static_cast<double>(qty) - fee;
         }
         std::cout << date << "\t" << side << "\t" << price << "\t" << qty << "\n";
+        if (tradeLog_.is_open()) { tradeLog_ << date << "," << side << "," << price << "," << qty << "\n"; tradeLog_.flush(); }
     }
 
     Feed&  feed_;
@@ -105,6 +122,8 @@ protected:
     double slippage_;
 
 private:
+    std::ofstream tradeLog_;
+
     // Read all batches from the feed and concatenate them into one OHLCBatch.
     // Always resets the feed first so this method is safe to call more than once.
     Batch loadAll() {

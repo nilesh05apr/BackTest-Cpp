@@ -1,0 +1,2 @@
+add_executable(PortfolioGapOpen main.cpp)
+target_link_libraries(PortfolioGapOpen PRIVATE backtest)
