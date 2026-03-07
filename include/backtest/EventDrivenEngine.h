@@ -30,6 +30,7 @@
 #include <memory>
 #include <string>
 #include <iostream>
+#include <fstream>
 #include <cstddef>
 
 namespace backtest {
@@ -110,6 +111,19 @@ public:
     void setCash(double cash)       noexcept { balance_ = initialCash_ = cash; }
     void setCommission(double rate) noexcept { commissionRate_ = rate; totalCommission_ = 0.0; }
     void setSlippage(double slip)   noexcept { slippage_ = slip; }
+
+    // Open a CSV file and write all subsequent trades to it.
+    // The file is created with the header: date,action,price,qty
+    void setTradeLogPath(const std::string& path) {
+        tradeLog_.open(path);
+        if (tradeLog_.is_open()) {
+            tradeLog_ << "date,action,price,qty\n";
+        }
+    }
+
+    double getBalance()         const noexcept { return balance_; }
+    double getInitialCash()     const noexcept { return initialCash_; }
+    double getTotalCommission() const noexcept { return totalCommission_; }
 
     // Run the full backtest.
     void run() {
@@ -204,6 +218,7 @@ protected:
         isLong_ = true;
         longQty_ += qty;
         std::cout << date << "\tBUY\t" << price << "\t" << qty << "\n";
+        if (tradeLog_.is_open()) tradeLog_ << date << ",BUY," << price << "," << qty << "\n";
     }
 
     void executeSell(const std::string& date, double price, std::size_t qty) noexcept {
@@ -213,6 +228,7 @@ protected:
         isShort_ = true;
         shortQty_ += qty;
         std::cout << date << "\tSELL\t" << price << "\t" << qty << "\n";
+        if (tradeLog_.is_open()) tradeLog_ << date << ",SELL," << price << "," << qty << "\n";
     }
 
     void executeClose(const std::string& date, double price) noexcept {
@@ -221,6 +237,7 @@ protected:
             totalCommission_ += fee;
             balance_ += price * static_cast<double>(longQty_) - fee;
             std::cout << date << "\tCLOSE LONG\t" << price << "\t" << longQty_ << "\n";
+            if (tradeLog_.is_open()) tradeLog_ << date << ",CLOSE LONG," << price << "," << longQty_ << "\n";
             longQty_ = 0;
             isLong_  = false;
         } else if (isShort_) {
@@ -228,6 +245,7 @@ protected:
             totalCommission_ += fee;
             balance_ -= price * static_cast<double>(shortQty_) + fee;
             std::cout << date << "\tCLOSE SHORT\t" << price << "\t" << shortQty_ << "\n";
+            if (tradeLog_.is_open()) tradeLog_ << date << ",CLOSE SHORT," << price << "," << shortQty_ << "\n";
             shortQty_ = 0;
             isShort_ = false;
         }
@@ -246,6 +264,8 @@ protected:
     double slippage_;
 
 private:
+    std::ofstream tradeLog_;
+
     void drainQueue() {
         while (!eventQueue_.empty()) {
             auto& evtPtr = eventQueue_.front();

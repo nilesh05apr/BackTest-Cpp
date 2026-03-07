@@ -4,6 +4,7 @@
 
 #include "backtest/Data.h"
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <cstddef>
 
@@ -21,6 +22,19 @@ public:
     void setCash(double cash) noexcept { balance_ = initialCash_ = cash; }
     void setCommission(double rate) noexcept { commissionRate_ = rate; totalCommission_ = 0.0; }
     void setSlippage(double slip) noexcept { slippage_ = slip; }
+
+    // Open a CSV file and write all subsequent trades to it.
+    // The file is created with the header: date,action,price,qty
+    void setTradeLogPath(const std::string& path) {
+        tradeLog_.open(path);
+        if (tradeLog_.is_open()) {
+            tradeLog_ << "date,action,price,qty\n";
+        }
+    }
+
+    double getBalance()        const noexcept { return balance_; }
+    double getInitialCash()    const noexcept { return initialCash_; }
+    double getTotalCommission() const noexcept { return totalCommission_; }
 
     // Run the full backtest from bar 0.
     void run() {
@@ -102,6 +116,7 @@ protected:
             }
         }
         std::cout << date << "\tBUY\t" << "- " << price << " \t-\t " << qty << "\n";
+        if (tradeLog_.is_open()) tradeLog_ << date << ",BUY," << price << "," << qty << "\n";
     }
 
     void sell(const std::string& date, double price, std::size_t qty) noexcept {
@@ -124,6 +139,7 @@ protected:
             }
         }
         std::cout << date << "\tSELL\t" << "- " << price << " \t-\t " << qty << "\n";
+        if (tradeLog_.is_open()) tradeLog_ << date << ",SELL," << price << "," << qty << "\n";
     }
 
     void close(const std::string& date, double price, std::size_t qty) noexcept {
@@ -139,6 +155,7 @@ protected:
             if (shortQty_ == 0) isShort_ = false;
         }
         std::cout << date << "\tCLOSE\t" << "- " << price << " \t-\t " << qty << "\n";
+        if (tradeLog_.is_open()) tradeLog_ << date << ",CLOSE," << price << "," << qty << "\n";
     }
 
     Feed& feed_;
@@ -152,6 +169,9 @@ protected:
     double totalCommission_;
     double slippage_;
     double totalSlippage_;
+
+private:
+    std::ofstream tradeLog_;
 };
 
 }
